@@ -1,0 +1,10 @@
+---
+name: VMware vSphere 7.0 ESXi STIG Readiness Guide
+title: VMware vSphere 7.0 ESXi STIG Readiness Guide
+summary: An InSpec Compliance Profile
+version: 1.0.4
+
+depends:
+  - name: esxi-ssh
+    path: esxi-ssh
+
