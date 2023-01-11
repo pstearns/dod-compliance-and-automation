@@ -406,7 +406,7 @@ Function cklMarkup ($xmlCkl){
     foreach ($KnownID in $KnownIDs){
             $Vuln_Node          = $xmlCkl.CHECKLIST.STIGS.iSTIG.VULN | Where-Object { $_.STIG_DATA.ATTRIBUTE_DATA -eq $KnownID }
             $Vuln_Object        = $KnownIssues | where-object VULN_ID -contains $KnownID
-            if (($Vuln_Node.STATUS -eq "Not_Reviewed") -or ($Vuln_Node.STATUS -eq "NotAFinding")){
+            if (($Vuln_Node.STATUS -eq "Not_Reviewed") -or ($Vuln_Node.STATUS -eq "NotAFinding") -or ($Vuln_Node.STATUS -eq "NotAFinding")){
                 $Vuln_Node.COMMENTS = $Vuln_Object.COMMENT
                 $Vuln_Node.STATUS   = $Vuln_Object.STATUS
             }
