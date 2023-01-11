@@ -39,18 +39,7 @@ control 'VCLU-70-000023' do
   tag cci: ['CCI-001312']
   tag nist: ['SI-11 a']
 
-  begin
-    xmlconf = xml("#{input('serverXmlPath')}")
-    if xmlconf['Server/Service/Connector/attribute::server'].is_a?(Array)
-      xmlconf['Server/Service/Connector/attribute::server'].each do |x|
-        describe x do
-          it { should eq "#{input('server')}" }
-        end
-      end
-    else
-      describe xml(xmlconf['Server/Service/Connector/attribute::server']) do
-        it { should eq "#{input('server')}" }
-      end
-    end
+  describe xml("#{input('serverXmlPath')}") do
+    its(['/Server/Service/Connector[@port="${bio-custom.http.port}"]/@server']) { should cmp 'Anonymous' }
   end
 end
