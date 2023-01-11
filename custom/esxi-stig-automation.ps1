@@ -436,23 +436,23 @@ Function RemediateItem ($SSHItems,$OpenItems,$vmhost,$xmlCkl){
     $SSHFixItems = Compare-Object $OpenItems $SSHItems -IncludeEqual -PassThru | where-object {$_.SideIndicator -eq '=='}
     $FixItems = Compare-Object $OpenItems $FinalItems -includeEqual -passthru | where-object {$_.SideIndicator -eq '<='}
     $FixItems = Compare-Object $FixItems $SSHItems -includeEqual -passthru | where-object {$_.SideIndicator -eq '<='}
-
-    # Enable Access by Disable Lockdown and Enable SSH and ESXi Password Age
-    try{EnableAccess $vmhost}
-    catch{Write-Error "Failed to Enable access to $($vmhost)... $_.Exception"}
+    if($SSHFixItems){
+        # Enable Access by Disable Lockdown and Enable SSH and ESXi Password Age
+        try{EnableAccess $vmhost}
+        catch{Write-Error "Failed to Enable access to $($vmhost)... $_.Exception"}
          
-    # Run Ansible SSH STIG Items
-    # =============================================================================================
-    if($ansible -ne "NotInstalled"){
-        $SSHFixItemsString = $SSHFixItems -join ","
-        ansible-playbook -i $vmhost, -u $esxcred.UserName $ansiblePlaybook --tags $SSHFixItemsString -e "ansible_ssh_pass=$($esxcred.GetNetworkCredential().password)"    
-    }
+        # Run Ansible SSH STIG Items
+        # =============================================================================================
+        if($ansible -ne "NotInstalled"){
+            $SSHFixItemsString = $SSHFixItems -join ","
+            ansible-playbook -i $vmhost, -u $esxcred.UserName $ansiblePlaybook --tags $SSHFixItemsString -e "ansible_ssh_pass=$($esxcred.GetNetworkCredential().password)"    
+        }
     
-    # Running Inspec to Verify SSH Items
-    # =============================================================================================
-    inspec exec $inspecEsxSSH -t ssh://esxadmin@$vmhost --password $esxcred.GetNetworkCredential().password --reporter json:$fixsshReportFile --controls $SSHFixItems | Out-Null
-    inspec_tools inspec2ckl -j $fixsshReportFile -o $fixsshCklFile
-
+        # Running Inspec to Verify SSH Items
+        # =============================================================================================
+        inspec exec $inspecEsxSSH -t ssh://esxadmin@$vmhost --password $esxcred.GetNetworkCredential().password --reporter json:$fixsshReportFile --controls $SSHFixItems | Out-Null
+        inspec_tools inspec2ckl -j $fixsshReportFile -o $fixsshCklFile
+    }
     # Running Powershell STIG items
     # =============================================================================================
     foreach ($FixItem in $FixItems){
